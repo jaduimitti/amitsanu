@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>I am Silky</title>
+    <style>
+        /* CSS Section */
+        body {
+            background-color: black;
+            color: white;
+            font-family: Arial, sans-serif;
+            perspective: 1000px; /* 3D perspective */
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: green;
+            text-align: center;
+            padding: 20px;
+            position: relative;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.5);
+        }
+
+        .hacker-icon {
+            width: 100px;
+            height: 100px;
+            background-color: #00FF00; /* Bright green dot */
+            border-radius: 50%;
+            box-shadow: 0 0 20px #00FF00;
+            display: inline-block;
+            margin: 20px;
+        }
+
+        section {
+            margin: 20px;
+            padding: 20px;
+            border: 1px solid white;
+            border-radius: 8px;
+            background: linear-gradient(145deg, #222, #333);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.7);
+        }
+
+        h2 {
+            color: lightgreen;
+            text-shadow: 1px 1px 2px black;
+        }
+
+        .controls {
+            margin-top: 10px;
+        }
+
+        .controls input[type="file"] {
+            margin-right: 10px;
+        }
+
+        .controls button {
+            padding: 5px 10px;
+            margin-right: 5px;
+            cursor: pointer;
+            background-color: green;
+            border: none;
+            color: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .controls button:hover {
+            background-color: darkgreen;
+        }
+
+        /* Pop-up Styles */
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            color: black;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+
+        .popup button {
+            margin-right: 10px;
+        }
+
+        .popup-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- HTML Section -->
+    <header>
+        <h1>I am Silky</h1>
+        <p>My puppy's name is Donkey</p>
+        <div class="hacker-icon"></div> <!-- Hacker icon -->
+    </header>
+
+    <!-- Amit Bhaiya Ji Aapke Apps Section -->
+    <section id="apps">
+        <h2>Amit Bhaiya Ji Aapke Apps</h2>
+        <div class="controls">
+            <input type="file" id="fileUploadApps">
+            <button onclick="uploadFile('apps')">Upload</button>
+            <button onclick="openFile('apps')">Open</button>
+            <button onclick="deleteFile('apps')">Delete</button>
+        </div>
+        <p>Share and list the apps you like.</p>
+    </section>
+
+    <!-- Amit Bhaiya Ji Aapki Information Section -->
+    <section id="info">
+        <h2>Amit Bhaiya Ji Aapki Information</h2>
+        <div class="controls">
+            <input type="file" id="fileUploadInfo">
+            <button onclick="uploadFile('info')">Upload</button>
+            <button onclick="openFile('info')">Open</button>
+            <button onclick="deleteFile('info')">Delete</button>
+        </div>
+        <p>Include personal details or any information here.</p>
+    </section>
+
+    <!-- Amit Bhaiya Ji Aapki Subject Planning System Section -->
+    <section id="planning">
+        <h2>Amit Bhaiya Ji Aapki Subject Planning System</h2>
+        <div class="controls">
+            <input type="file" id="fileUploadPlanning">
+            <button onclick="uploadFile('planning')">Upload</button>
+            <button onclick="openFile('planning')">Open</button>
+            <button onclick="deleteFile('planning')">Delete</button>
+        </div>
+        <p>Display your subject planning and study schedule.</p>
+    </section>
+
+    <!-- Pop-up for file management -->
+    <div class="popup-overlay" id="popupOverlay"></div>
+    <div class="popup" id="filePopup">
+        <h3 id="popupTitle"></h3>
+        <div id="popupContent"></div>
+        <button onclick="closePopup()">Close</button>
+    </div>
+
+    <!-- JavaScript Section -->
+    <script>
+        const files = {};
+
+        function uploadFile(section) {
+            const fileInput = document.getElementById(`fileUpload${section.charAt(0).toUpperCase() + section.slice(1)}`);
+            const file = fileInput.files[0];
+            if (file) {
+                files[section] = files[section] || {};
+                files[section][file.name] = {
+                    url: URL.createObjectURL(file),
+                    type: file.type
+                };
+                alert(`Uploaded ${file.name} to ${section}`);
+            } else {
+                alert(`No file selected for ${section}`);
+            }
+        }
+
+        function openFile(section) {
+            const popupTitle = document.getElementById('popupTitle');
+            const popupContent = document.getElementById('popupContent');
+            const popupOverlay = document.getElementById('popupOverlay');
+            const filePopup = document.getElementById('filePopup');
+
+            if (files[section] && Object.keys(files[section]).length > 0) {
+                popupTitle.innerText = `Open File from ${section}`;
+                popupContent.innerHTML = Object.keys(files[section]).map(fileName => {
+                    return `<button onclick="viewFile('${section}', '${fileName}')">${fileName}</button>`;
+                }).join('<br>');
+                filePopup.style.display = 'block';
+                popupOverlay.style.display = 'block';
+            } else {
+                alert(`No files uploaded in ${section}`);
+            }
+        }
+
+        function viewFile(section, fileName) {
+            const file = files[section][fileName];
+            if (file) {
+                if (file.type.startsWith('image/') || file.type.startsWith('audio/') || file.type.startsWith('video/')) {
+                    window.open(file.url);
+                } else {
+                    alert(`File type ${file.type} cannot be opened directly.`);
+                }
+            }
+        }
+
+        function deleteFile(section) {
+            const popupTitle = document.getElementById('popupTitle');
+            const popupContent = document.getElementById('popupContent');
+            const popupOverlay = document.getElementById('popupOverlay');
+            const filePopup = document.getElementById('filePopup');
+
+            if (files[section] && Object.keys(files[section]).length > 0) {
+                popupTitle.innerText = `Delete File from ${section}`;
+                popupContent.innerHTML = Object.keys(files[section]).map(fileName => {
+                    return `<button onclick="confirmDelete('${section}', '${fileName}')">${fileName}</button>`;
+                }).join('<br>');
+                filePopup.style.display = 'block';
+                popupOverlay.style.display = 'block';
+            } else {
+                alert(`No files uploaded in ${section}`);
+            }
+        }
+
+        function confirmDelete(section, fileName) {
+            delete files[section][fileName];
+            alert(`Deleted ${fileName} from ${section}`);
+            closePopup();
+        }
+
+        function closePopup() {
+            document.getElementById('filePopup').style.display = 'none';
+            document.getElementById('popupOverlay').style.display = 'none';
+        }
+    </script>
+
+</body>
+</html>
